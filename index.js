@@ -73,7 +73,7 @@ const courseRoutes = require("./routes/courseRoutes");
 const departmentRoutes = require("./routes/departmentRoutes");
 const subjectRoutes = require("./routes/subjectRoutes");
 const uploadRoute = require("./routes/uploadRoute");
-const transferFundRoutes = require("./routes/transferfunds");
+const transferFundRoutes = require("./routes/Transferfunds");
 const Account = require("./routes/Account"); 
 
 
