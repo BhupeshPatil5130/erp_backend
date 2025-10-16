@@ -69,7 +69,43 @@ router.get("/enquiries/count", async (req, res) => {
 // ✅ GET: Fetch all enquiries
 router.get("/enquiries", async (req, res) => {
   try {
-    const enquiries = await EnquiryModel.find();
+    const { view = "full", status, program, q, from, to } = req.query;
+
+    const filter = {};
+    if (status) filter.status = status;
+    if (program) filter.program = program;
+    if (from || to) {
+      filter.createdAt = {};
+      if (from) filter.createdAt.$gte = new Date(from);
+      if (to) filter.createdAt.$lte = new Date(to);
+    }
+
+    const search = q
+      ? {
+          $or: [
+            { studentName: { $regex: q, $options: "i" } },
+            { email: { $regex: q, $options: "i" } },
+            { mobile: { $regex: q, $options: "i" } },
+            { locality: { $regex: q, $options: "i" } },
+          ],
+        }
+      : null;
+
+    const query = EnquiryModel.find(search ? { ...filter, ...search } : filter);
+
+    if (view === "table") {
+      query.select({
+        studentName: 1,
+        email: 1,
+        mobile: 1,
+        program: 1,
+        dob: 1,
+        locality: 1,
+        createdAt: 1,
+      });
+    }
+
+    const enquiries = await query.sort({ createdAt: -1 }).lean();
     res.status(200).json({ success: true, data: enquiries });
   } catch (error) {
     console.error("Error fetching enquiries:", error);

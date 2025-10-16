@@ -14,4 +14,17 @@ const LSQEnquirySchema = new mongoose.Schema(
   { timestamps: true }
 )
 
+// Ensure client receives `id` instead of `_id` and no version key
+LSQEnquirySchema.set("toJSON", {
+  versionKey: false,
+  transform: function (doc, ret) {
+    ret.id = ret._id
+    delete ret._id
+    return ret
+  },
+})
+
+// Optimize sorting on list views
+LSQEnquirySchema.index({ createdAt: -1 })
+
 module.exports = mongoose.model("LSQEnquiry", LSQEnquirySchema)

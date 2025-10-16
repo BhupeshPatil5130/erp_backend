@@ -18,4 +18,17 @@ const EnquirySchema = new mongoose.Schema({
   status: { type: String, default: "new" }
 }, { timestamps: true })
 
+// Transform output and optimize list queries
+EnquirySchema.set("toJSON", {
+  versionKey: false,
+  transform: function (doc, ret) {
+    ret.id = ret._id
+    delete ret._id
+    return ret
+  }
+})
+
+// Index for faster sorting/filtering in list views
+EnquirySchema.index({ createdAt: -1 })
+
 module.exports = mongoose.model("Enquiry", EnquirySchema)
