@@ -12,6 +12,9 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const FRONTEND_URL = process.env.FRONTEND_URL ||  "http://localhost:3000";
 
+// Behind Render/Vercel/Cloudflare proxies
+app.set('trust proxy', 1);
+
 // Connect to MongoDB
 mongoose
   .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/yourdbname", {
@@ -37,13 +40,14 @@ app.use(
     secret: process.env.SESSION_SECRET || "your-secret-key",
     resave: false,
     saveUninitialized: false,
+    proxy: true,
     store: MongoStore.create({
       mongoUrl: process.env.MONGODB_URI || "mongodb://localhost:27017/yourdbname",
     }),
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // use true in production with HTTPS
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production", // true in production with HTTPS
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 1000 * 60 * 60 * 24, // 1 day session
     },
   })
